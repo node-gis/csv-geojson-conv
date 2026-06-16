@@ -1,4 +1,7 @@
 .DS_Store
 node_modules/
 
+# generated conversion output
+*.geojson
+*.topojson
 tests/**/*result.geojson
