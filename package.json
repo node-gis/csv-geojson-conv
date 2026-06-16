@@ -24,6 +24,9 @@
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
+  "bin": {
+    "csv-geojson-conv": "./lib/cjs/cli.js"
+  },
   "sideEffects": false,
   "files": [
     "lib/"
