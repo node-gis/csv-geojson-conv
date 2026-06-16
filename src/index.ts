@@ -37,7 +37,9 @@ function readCoordinate(row: CSVRecord, columnName: string, rowIndex: number, ax
 function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCollection<Point, CSVRecord> {
     const { latitudeColumnName = "Latitude", longitudeColumnName = "Longitude" } = options || {};
 
-    const records = parse(strCsv, { columns: true, trim: true, skip_empty_lines: true }) as CSVRecord[];
+    // `bom: true` strips a UTF-8 BOM (common in Excel/Windows exports) so the
+    // first header isn't read as "﻿Latitude" and coordinate lookup works.
+    const records = parse(strCsv, { columns: true, trim: true, skip_empty_lines: true, bom: true }) as CSVRecord[];
 
     const features: Feature<Point, CSVRecord>[] = records.map((row, rowIndex) => ({
         type: "Feature",

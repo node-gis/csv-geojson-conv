@@ -54,6 +54,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && node scripts/postbuild.mjs",
+    "prepublishOnly": "bun run build",
     "check": "bun run build && bun test",
     "test": "bun test",
     "tsc": "bun run build"

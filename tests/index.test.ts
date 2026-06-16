@@ -60,6 +60,11 @@ describe("csvToGeojson", () => {
         );
     });
 
+    test("strips a UTF-8 BOM from the header (Excel/Windows CSVs)", () => {
+        const geojson = csvToGeojson("﻿Latitude,Longitude\n37.1,127.2");
+        expect(geojson.features[0].geometry.coordinates).toEqual([127.2, 37.1]);
+    });
+
     test("exposes a named export equal to the default export", () => {
         expect(csvToGeoJSON).toBe(csvToGeojson);
         const geojson = csvToGeoJSON("Latitude,Longitude\n37.1,127.2");

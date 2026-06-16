@@ -50,4 +50,16 @@ describe("cli", () => {
         expect(exitCode).toBe(1);
         expect(stderr).toContain("Out-of-range latitude");
     });
+
+    test("rejects an option with a missing value", async () => {
+        const { stderr, exitCode } = await runCli(["--latitude"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(2);
+        expect(stderr).toContain("Missing value for --latitude");
+    });
+
+    test("rejects -o immediately followed by another flag", async () => {
+        const { stderr, exitCode } = await runCli(["-o", "--pretty"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(2);
+        expect(stderr).toContain("Missing value for -o");
+    });
 });
