@@ -83,4 +83,24 @@ describe("cli", () => {
         expect(exitCode).toBe(0);
         expect(JSON.parse(stdout).features[0].geometry.coordinates).toEqual([127.2, 37.1]);
     });
+
+    test("outputs TopoJSON with --format topojson", async () => {
+        const { stdout, exitCode } = await runCli(["--format", "topojson"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(0);
+        const topo = JSON.parse(stdout);
+        expect(topo.type).toBe("Topology");
+        expect(topo.objects.points.geometries[0].coordinates).toEqual([127.2, 37.1]);
+    });
+
+    test("supports the -f topojson short flag", async () => {
+        const { stdout, exitCode } = await runCli(["-f", "topojson"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(0);
+        expect(JSON.parse(stdout).type).toBe("Topology");
+    });
+
+    test("rejects an invalid --format value", async () => {
+        const { stderr, exitCode } = await runCli(["--format", "kml"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(2);
+        expect(stderr).toContain('Invalid format "kml"');
+    });
 });

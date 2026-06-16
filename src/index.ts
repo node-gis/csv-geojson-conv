@@ -1,10 +1,15 @@
 import { parse } from "csv-parse/sync";
-
-import type { Feature, FeatureCollection, Point } from "geojson";
+import type { BBox, Feature, FeatureCollection, Point } from "geojson";
+import type { GeometryCollection, Topology, Point as TopoPoint } from "topojson-specification";
 
 export interface CSVtoGeoJSONOptions {
     latitudeColumnName?: string;
     longitudeColumnName?: string;
+}
+
+export interface CSVtoTopoJSONOptions extends CSVtoGeoJSONOptions {
+    /** Name of the object/layer in the TopoJSON output. Defaults to "points". */
+    objectName?: string;
 }
 type CSVRecord = Record<string, string>;
 
@@ -65,7 +70,56 @@ function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCol
     return { type: "FeatureCollection", features };
 }
 
+function CSVtoTopoJSON(strCsv: string, options?: CSVtoTopoJSONOptions): Topology {
+    const { objectName = "points", ...geoOptions } = options || {};
+    if (objectName === "") {
+        throw new Error("objectName must not be empty");
+    }
+
+    // Point features have no shared boundaries, so the TopoJSON has no arcs and
+    // each point maps straight to a geometry. This avoids pulling in a topology
+    // builder (and its transitive CLI dependency) just to wrap points.
+    const { features } = CSVtoGeoJSON(strCsv, geoOptions);
+
+    const geometries: TopoPoint[] = features.map((feature) => ({
+        type: "Point",
+        coordinates: feature.geometry.coordinates,
+        properties: feature.properties,
+    }));
+
+    const collection: GeometryCollection = { type: "GeometryCollection", geometries };
+    const topology: Topology = { type: "Topology", objects: { [objectName]: collection }, arcs: [] };
+
+    const bbox = boundingBox(features);
+    if (bbox) {
+        topology.bbox = bbox;
+    }
+
+    return topology;
+}
+
+function boundingBox(features: Feature<Point, CSVRecord>[]): BBox | undefined {
+    if (features.length === 0) {
+        return undefined;
+    }
+
+    let minLon = Infinity;
+    let minLat = Infinity;
+    let maxLon = -Infinity;
+    let maxLat = -Infinity;
+
+    for (const feature of features) {
+        const [lon, lat] = feature.geometry.coordinates;
+        if (lon < minLon) minLon = lon;
+        if (lat < minLat) minLat = lat;
+        if (lon > maxLon) maxLon = lon;
+        if (lat > maxLat) maxLat = lat;
+    }
+
+    return [minLon, minLat, maxLon, maxLat];
+}
+
 export default CSVtoGeoJSON;
-// Named export so CommonJS consumers can write
-// `const { csvToGeoJSON } = require('@node-gis/csv-geojson-conv')`.
-export { CSVtoGeoJSON as csvToGeoJSON };
+// Named exports so CommonJS consumers can write
+// `const { csvToGeoJSON, csvToTopoJSON } = require('@node-gis/csv-geojson-conv')`.
+export { CSVtoGeoJSON as csvToGeoJSON, CSVtoTopoJSON as csvToTopoJSON };
