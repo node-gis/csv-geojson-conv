@@ -8,7 +8,9 @@ export interface CSVtoGeoJSONOptions {
 }
 type CSVRecord = Record<string, string>;
 
-function readCoordinate(row: CSVRecord, columnName: string, rowIndex: number): number {
+type Axis = "latitude" | "longitude";
+
+function readCoordinate(row: CSVRecord, columnName: string, rowIndex: number, axis: Axis): number {
     const rawValue = row[columnName];
 
     if (rawValue === undefined) {
@@ -18,6 +20,11 @@ function readCoordinate(row: CSVRecord, columnName: string, rowIndex: number): n
     const value = Number(rawValue);
     if (!Number.isFinite(value)) {
         throw new Error(`Invalid coordinate value "${rawValue}" in column "${columnName}" at CSV row ${rowIndex + 2}`);
+    }
+
+    const limit = axis === "latitude" ? 90 : 180;
+    if (value < -limit || value > limit) {
+        throw new Error(`Out-of-range ${axis} "${rawValue}" in column "${columnName}" at CSV row ${rowIndex + 2} (expected -${limit}..${limit})`);
     }
 
     return value;
@@ -34,8 +41,8 @@ function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCol
         geometry: {
             type: "Point",
             coordinates: [
-                readCoordinate(row, longitudeColumnName, rowIndex),
-                readCoordinate(row, latitudeColumnName, rowIndex),
+                readCoordinate(row, longitudeColumnName, rowIndex, "longitude"),
+                readCoordinate(row, latitudeColumnName, rowIndex, "latitude"),
             ],
         },
     }));
