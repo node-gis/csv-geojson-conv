@@ -146,7 +146,7 @@ const topology = csvToTopoJSON(csv, { objectName: 'points' });
 // { type: "Topology", objects: { points: { type: "GeometryCollection", ... } }, ... }
 ```
 
-`objectName` (default `"points"`) names the layer/object in the output. The same coordinate-column options apply.
+`objectName` (default `"points"`) names the layer/object in the output. The same coordinate-column options apply. The `Topology` is unquantized (lossless); post-process with [`topoquantize`](https://github.com/topojson/topojson-client) if you want smaller files.
 
 ## API
 

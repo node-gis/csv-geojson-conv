@@ -132,4 +132,15 @@ describe("csvToTopoJSON", () => {
     test("propagates coordinate validation errors", () => {
         expect(() => csvToTopoJSON("Latitude,Longitude\n99,127.2")).toThrow("Out-of-range latitude");
     });
+
+    test("rejects an empty objectName", () => {
+        expect(() => csvToTopoJSON("Latitude,Longitude\n37.1,127.2", { objectName: "" })).toThrow(
+            "objectName must not be empty",
+        );
+    });
+
+    test("computes a bbox over all points", () => {
+        const topo = csvToTopoJSON("Latitude,Longitude\n37.1,127.2\n35.0,129.0");
+        expect(topo.bbox).toEqual([127.2, 35, 129, 37.1]);
+    });
 });

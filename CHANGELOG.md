@@ -11,7 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - TopoJSON output: new named export `csvToTopoJSON(csv, options)` (with an
   `objectName` option, default `"points"`) and a CLI `-f, --format
-  geojson|topojson` flag. Adds `topojson-server` as a runtime dependency.
+  geojson|topojson` flag. Built in-house (no heavy runtime dependency) since
+  point data needs no arcs; output is an unquantized `Topology` with a bbox.
 
 ## [1.0.0-beta.6]
 
