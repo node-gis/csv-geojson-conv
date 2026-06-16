@@ -1,6 +1,6 @@
 {
-  "name": "csv-geojson-conv",
-  "version": "1.0.0-beta.4",
+  "name": "@node-gis/csv-geojson-conv",
+  "version": "1.0.0-beta.5",
   "description": "ESM/CJS module to convert CSV string to GeoJSON in node.js or browser",
   "packageManager": "bun@1.3.9",
   "author": {
@@ -29,6 +29,9 @@
     "lib/"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
     "check": "bun run build && bun test",
