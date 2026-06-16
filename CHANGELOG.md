@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0]
+
+First stable release. Includes everything from the `1.0.0-beta.*` line:
+dual ESM/CJS package with a correct `exports` map, GeoJSON + TopoJSON output
+(library `csvToGeoJSON` / `csvToTopoJSON` and a CLI with `--format`),
+WGS84-validated coordinates, BOM handling, and a zero-install CLI
+(`npx` / `bunx` / `pnpm dlx` / `yarn dlx`).
+
+### Fixed
+
+- Correct the LICENSE copyright holder.
+- Documented the Windows/PowerShell `>` UTF-8 redirection gotcha (use `-o`).
+
 ## [1.0.0-beta.7]
 
 ### Added
@@ -57,7 +70,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README rewritten in English, leading with the CSV → GeoJSON value
   proposition and a no-install quick start.
 
-[Unreleased]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.7...HEAD
+[Unreleased]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.7...v1.0.0
 [1.0.0-beta.7]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.6...v1.0.0-beta.7
 [1.0.0-beta.6]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.5...v1.0.0-beta.6
 [1.0.0-beta.5]: https://github.com/node-gis/csv-geojson-conv/releases/tag/v1.0.0-beta.5
