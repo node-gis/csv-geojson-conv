@@ -7,9 +7,9 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield&issueType=security)
 
-**Turn a CSV into GeoJSON in one call — or one command.** Point it at any CSV with latitude/longitude columns and get back a valid GeoJSON `FeatureCollection` of `Point` features, ready to drop onto a map.
+**Turn a CSV into GeoJSON or TopoJSON in one call — or one command.** Point it at any CSV with latitude/longitude columns and get back a valid GeoJSON `FeatureCollection` of `Point` features (or a TopoJSON `Topology`), ready to drop onto a map.
 
-- 🗺️ **CSV → GeoJSON, instantly.** Latitude/longitude columns become coordinates; every other column becomes a feature property.
+- 🗺️ **CSV → GeoJSON or TopoJSON, instantly.** Latitude/longitude columns become coordinates; every other column becomes a feature property.
 - ⚡ **Zero config.** Sensible `Latitude` / `Longitude` defaults, overridable for any column names.
 - 🧰 **Library _and_ CLI.** Call it from code, or run it with `npx` / `bunx` / `pnpm dlx` — no install required.
 - 📦 **ESM + CJS + TypeScript types.** Works in Node.js and the browser.
@@ -51,12 +51,13 @@ bun add @node-gis/csv-geojson-conv
 csv-geojson-conv [options] [file]
 
 Reads CSV from <file> (or from stdin when no file is given) and writes a
-GeoJSON FeatureCollection of Point features to stdout.
+GeoJSON FeatureCollection (or a TopoJSON Topology) of Point features to stdout.
 
 Options:
+  -f, --format <fmt>   output format: geojson | topojson  (default: geojson)
   --latitude <name>    latitude column name   (default: Latitude)
   --longitude <name>   longitude column name  (default: Longitude)
-  -o, --output <file>  write GeoJSON to a file instead of stdout
+  -o, --output <file>  write to a file instead of stdout
   --pretty             pretty-print the JSON output
   -h, --help           show help
   -v, --version        show version
@@ -69,6 +70,9 @@ Examples:
 ```sh
 # Convert a file and pretty-print to a new file
 npx @node-gis/csv-geojson-conv points.csv --pretty -o points.geojson
+
+# Output TopoJSON instead of GeoJSON
+npx @node-gis/csv-geojson-conv points.csv --format topojson -o points.topojson
 
 # Pipe CSV in via stdin, with custom column names (--flag=value form)
 cat points.csv | npx @node-gis/csv-geojson-conv --latitude=lat --longitude=lon
@@ -130,6 +134,20 @@ const geojson = csvToGeojson(csv, {
 });
 ```
 
+### TopoJSON output
+
+Use the named `csvToTopoJSON` export to get a TopoJSON `Topology` instead:
+
+```js
+import { csvToTopoJSON } from '@node-gis/csv-geojson-conv';
+// CommonJS: const { csvToTopoJSON } = require('@node-gis/csv-geojson-conv');
+
+const topology = csvToTopoJSON(csv, { objectName: 'points' });
+// { type: "Topology", objects: { points: { type: "GeometryCollection", ... } }, ... }
+```
+
+`objectName` (default `"points"`) names the layer/object in the output. The same coordinate-column options apply.
+
 ## API
 
 ```ts
@@ -140,8 +158,18 @@ function csvToGeojson(
     longitudeColumnName?: string; // default: "Longitude"
   }
 ): FeatureCollection<Point, Record<string, string>>;
+
+function csvToTopoJSON(
+  csv: string,
+  options?: {
+    latitudeColumnName?: string;  // default: "Latitude"
+    longitudeColumnName?: string; // default: "Longitude"
+    objectName?: string;          // default: "points"
+  }
+): Topology; // from topojson-specification
 ```
 
+- `csvToGeojson` is the default export; `csvToGeoJSON` and `csvToTopoJSON` are named exports.
 - The latitude/longitude columns become each feature's `Point` coordinates (GeoJSON order: `[longitude, latitude]`).
 - Every other column is copied verbatim into the feature's `properties` (values stay strings).
 - Empty lines are skipped; whitespace around values is trimmed.

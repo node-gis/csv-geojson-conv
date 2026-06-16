@@ -1,10 +1,16 @@
 import { parse } from "csv-parse/sync";
-
 import type { Feature, FeatureCollection, Point } from "geojson";
+import { topology } from "topojson-server";
+import type { Topology } from "topojson-specification";
 
 export interface CSVtoGeoJSONOptions {
     latitudeColumnName?: string;
     longitudeColumnName?: string;
+}
+
+export interface CSVtoTopoJSONOptions extends CSVtoGeoJSONOptions {
+    /** Name of the object/layer in the TopoJSON output. Defaults to "points". */
+    objectName?: string;
 }
 type CSVRecord = Record<string, string>;
 
@@ -65,7 +71,13 @@ function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCol
     return { type: "FeatureCollection", features };
 }
 
+function CSVtoTopoJSON(strCsv: string, options?: CSVtoTopoJSONOptions): Topology {
+    const { objectName = "points", ...geoOptions } = options || {};
+    const featureCollection = CSVtoGeoJSON(strCsv, geoOptions);
+    return topology({ [objectName]: featureCollection });
+}
+
 export default CSVtoGeoJSON;
-// Named export so CommonJS consumers can write
-// `const { csvToGeoJSON } = require('@node-gis/csv-geojson-conv')`.
-export { CSVtoGeoJSON as csvToGeoJSON };
+// Named exports so CommonJS consumers can write
+// `const { csvToGeoJSON, csvToTopoJSON } = require('@node-gis/csv-geojson-conv')`.
+export { CSVtoGeoJSON as csvToGeoJSON, CSVtoTopoJSON as csvToTopoJSON };

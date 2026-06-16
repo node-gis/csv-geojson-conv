@@ -2,7 +2,17 @@ import { describe, expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import csvToGeojson, { csvToGeoJSON } from "../src";
+import csvToGeojson, { csvToGeoJSON, csvToTopoJSON } from "../src";
+
+interface PointGeometry {
+    type: string;
+    coordinates: [number, number];
+    properties: Record<string, string>;
+}
+
+function pointGeometries(topo: ReturnType<typeof csvToTopoJSON>, name: string): PointGeometry[] {
+    return (topo.objects[name] as unknown as { geometries: PointGeometry[] }).geometries;
+}
 
 describe("csvToGeojson", () => {
     test("converts CSV rows to GeoJSON point features with numeric coordinates", () => {
@@ -90,5 +100,36 @@ describe("csvToGeojson", () => {
         expect(csvToGeoJSON).toBe(csvToGeojson);
         const geojson = csvToGeoJSON("Latitude,Longitude\n37.1,127.2");
         expect(geojson.features[0].geometry.coordinates).toEqual([127.2, 37.1]);
+    });
+});
+
+describe("csvToTopoJSON", () => {
+    test("converts CSV to a TopoJSON Topology", () => {
+        const topo = csvToTopoJSON("Latitude,Longitude,name\n37.1,127.2,a");
+
+        expect(topo.type).toBe("Topology");
+        expect(Object.keys(topo.objects)).toEqual(["points"]);
+        const geom = pointGeometries(topo, "points")[0];
+        expect(geom.type).toBe("Point");
+        expect(geom.coordinates).toEqual([127.2, 37.1]);
+        expect(geom.properties.name).toBe("a");
+    });
+
+    test("uses a custom object name", () => {
+        const topo = csvToTopoJSON("Latitude,Longitude\n37.1,127.2", { objectName: "stations" });
+        expect(Object.keys(topo.objects)).toEqual(["stations"]);
+    });
+
+    test("honors custom coordinate column names", () => {
+        const topo = csvToTopoJSON("lat,lon\n37.1,127.2", {
+            latitudeColumnName: "lat",
+            longitudeColumnName: "lon",
+        });
+        const geom = pointGeometries(topo, "points")[0];
+        expect(geom.coordinates).toEqual([127.2, 37.1]);
+    });
+
+    test("propagates coordinate validation errors", () => {
+        expect(() => csvToTopoJSON("Latitude,Longitude\n99,127.2")).toThrow("Out-of-range latitude");
     });
 });

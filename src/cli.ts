@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync } from "node:fs";
 
-import CSVtoGeoJSON from "./index";
+import CSVtoGeoJSON, { csvToTopoJSON } from "./index";
 
 const pkg = require("../../package.json") as { name: string; version: string };
+
+type Format = "geojson" | "topojson";
 
 interface CliArgs {
     file?: string;
     stdin: boolean;
+    format: Format;
     latitude?: string;
     longitude?: string;
     output?: string;
@@ -16,18 +19,19 @@ interface CliArgs {
     version: boolean;
 }
 
-const HELP = `${pkg.name} — convert CSV to GeoJSON
+const HELP = `${pkg.name} — convert CSV to GeoJSON or TopoJSON
 
 Usage:
   csv-geojson-conv [options] [file]
 
 Reads CSV from <file> (or from stdin when no file is given) and writes a
-GeoJSON FeatureCollection of Point features to stdout.
+GeoJSON FeatureCollection (or a TopoJSON Topology) of Point features to stdout.
 
 Options:
+  -f, --format <fmt>   output format: geojson | topojson  (default: geojson)
   --latitude <name>    latitude column name   (default: Latitude)
   --longitude <name>   longitude column name  (default: Longitude)
-  -o, --output <file>  write GeoJSON to a file instead of stdout
+  -o, --output <file>  write to a file instead of stdout
   --pretty             pretty-print the JSON output
   -h, --help           show this help
   -v, --version        show version
@@ -38,11 +42,12 @@ from stdin.
 Examples:
   csv-geojson-conv points.csv
   csv-geojson-conv points.csv --pretty -o points.geojson
+  csv-geojson-conv points.csv --format topojson -o points.topojson
   cat points.csv | csv-geojson-conv --latitude=lat --longitude=lon
 `;
 
 function parseArgs(argv: string[]): CliArgs {
-    const args: CliArgs = { stdin: false, pretty: false, help: false, version: false };
+    const args: CliArgs = { stdin: false, format: "geojson", pretty: false, help: false, version: false };
 
     for (let i = 0; i < argv.length; i++) {
         // Support GNU `--flag=value` syntax by splitting the inline value off.
@@ -88,6 +93,15 @@ function parseArgs(argv: string[]): CliArgs {
                 noInline(arg);
                 args.pretty = true;
                 break;
+            case "-f":
+            case "--format": {
+                const format = valueFor(arg);
+                if (format !== "geojson" && format !== "topojson") {
+                    throw new Error(`Invalid format "${format}" (expected geojson or topojson)`);
+                }
+                args.format = format;
+                break;
+            }
             case "--latitude":
                 args.latitude = valueFor(arg);
                 break;
@@ -143,12 +157,16 @@ function main(): void {
     }
     const csv = readFileSync(args.file ?? 0, "utf8");
 
-    const geojson = CSVtoGeoJSON(csv, {
+    const coordinateOptions = {
         latitudeColumnName: args.latitude,
         longitudeColumnName: args.longitude,
-    });
+    };
+    const output =
+        args.format === "topojson"
+            ? csvToTopoJSON(csv, coordinateOptions)
+            : CSVtoGeoJSON(csv, coordinateOptions);
 
-    const json = JSON.stringify(geojson, null, args.pretty ? 2 : undefined);
+    const json = JSON.stringify(output, null, args.pretty ? 2 : undefined);
 
     if (args.output) {
         writeFileSync(args.output, `${json}\n`);

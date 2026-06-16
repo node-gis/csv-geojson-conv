@@ -1,7 +1,7 @@
 {
   "name": "@node-gis/csv-geojson-conv",
   "version": "1.0.0-beta.6",
-  "description": "Convert CSV to GeoJSON in Node.js or the browser — ESM/CJS library plus a zero-install CLI (npx/bunx)",
+  "description": "Convert CSV to GeoJSON or TopoJSON in Node.js or the browser — ESM/CJS library plus a zero-install CLI (npx/bunx)",
   "packageManager": "bun@1.3.9",
   "author": {
     "name": "Jeongyong Park",
@@ -19,6 +19,7 @@
   "keywords": [
     "csv",
     "geojson",
+    "topojson",
     "convert",
     "converter",
     "cli",
@@ -73,10 +74,13 @@
     "@biomejs/biome": "^2.5.0",
     "@types/bun": "^1.3.14",
     "@types/node": "^25.9.3",
+    "@types/topojson-server": "^3.0.4",
+    "@types/topojson-specification": "^1.0.5",
     "typescript": "^6.0.3"
   },
   "dependencies": {
     "@types/geojson": "^7946.0.8",
-    "csv-parse": "^5.0.4"
+    "csv-parse": "^5.0.4",
+    "topojson-server": "^3.0.1"
   }
 }
