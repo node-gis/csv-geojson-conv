@@ -1,6 +1,6 @@
 {
   "name": "csv-geojson-conv",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.4",
   "description": "ESM/CJS module to convert CSV string to GeoJSON in node.js or browser",
   "packageManager": "bun@1.3.9",
   "author": {
