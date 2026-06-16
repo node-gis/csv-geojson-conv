@@ -5,6 +5,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/csv-geojson-conv.svg)](https://www.npmjs.com/package/csv-geojson-conv)
 [![license](https://img.shields.io/npm/l/csv-geojson-conv.svg)](https://github.com/node-gis/csv-geojson-conv/blob/main/LICENSE)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield&issueType=security)
 
 A tiny ESM/CJS module that converts a CSV string into a GeoJSON `FeatureCollection` of `Point` features. Works in Node.js and the browser. Ships with TypeScript types.
 
