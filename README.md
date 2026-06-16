@@ -7,9 +7,35 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield&issueType=security)
 
-A tiny ESM/CJS module that converts a CSV string into a GeoJSON `FeatureCollection` of `Point` features. Works in Node.js and the browser. Ships with TypeScript types.
+**Turn a CSV into GeoJSON in one call — or one command.** Point it at any CSV with latitude/longitude columns and get back a valid GeoJSON `FeatureCollection` of `Point` features, ready to drop onto a map.
+
+- 🗺️ **CSV → GeoJSON, instantly.** Latitude/longitude columns become coordinates; every other column becomes a feature property.
+- ⚡ **Zero config.** Sensible `Latitude` / `Longitude` defaults, overridable for any column names.
+- 🧰 **Library _and_ CLI.** Call it from code, or run it with `npx` / `bunx` / `pnpm dlx` — no install required.
+- 📦 **ESM + CJS + TypeScript types.** Works in Node.js and the browser.
+- ✅ **Safe by default.** Validates coordinates and throws clear, row-numbered errors on bad data.
+
+## Quick start (no install)
+
+Run the converter directly with your package manager's runner:
+
+```sh
+# npm
+npx @node-gis/csv-geojson-conv points.csv > points.geojson
+
+# bun
+bunx @node-gis/csv-geojson-conv points.csv > points.geojson
+
+# pnpm
+pnpm dlx @node-gis/csv-geojson-conv points.csv > points.geojson
+
+# yarn (v2+) — there is no `yarnx`; use `yarn dlx`
+yarn dlx @node-gis/csv-geojson-conv points.csv > points.geojson
+```
 
 ## Install
+
+To use it as a library (or to get a local `csv-geojson-conv` command):
 
 ```sh
 npm install @node-gis/csv-geojson-conv
@@ -19,7 +45,34 @@ yarn add @node-gis/csv-geojson-conv
 bun add @node-gis/csv-geojson-conv
 ```
 
-## Usage
+## CLI
+
+```text
+csv-geojson-conv [options] [file]
+
+Reads CSV from <file> (or from stdin when no file is given) and writes a
+GeoJSON FeatureCollection of Point features to stdout.
+
+Options:
+  --latitude <name>    latitude column name   (default: Latitude)
+  --longitude <name>   longitude column name  (default: Longitude)
+  -o, --output <file>  write GeoJSON to a file instead of stdout
+  --pretty             pretty-print the JSON output
+  -h, --help           show help
+  -v, --version        show version
+```
+
+Examples:
+
+```sh
+# Convert a file and pretty-print to a new file
+npx @node-gis/csv-geojson-conv points.csv --pretty -o points.geojson
+
+# Pipe CSV in via stdin, with custom column names
+cat points.csv | npx @node-gis/csv-geojson-conv --latitude lat --longitude lon
+```
+
+## Library usage
 
 ```js
 // ESM
@@ -27,9 +80,9 @@ import csvToGeojson from '@node-gis/csv-geojson-conv';
 // CommonJS
 const csvToGeojson = require('@node-gis/csv-geojson-conv');
 
-const csv = `Latitude,Longitude,Region,Name,Note
-37.4355672,126.9388092,서울,서울본부,
-35.0819546,129.0552017,부산,KBS중계소,`;
+const csv = `Latitude,Longitude,name,category
+37.4355672,126.9388092,Seoul HQ,office
+35.0819546,129.0552017,Busan Branch,office`;
 
 const geojson = csvToGeojson(csv);
 ```
@@ -43,7 +96,7 @@ Result:
     {
       "type": "Feature",
       "geometry": { "type": "Point", "coordinates": [126.9388092, 37.4355672] },
-      "properties": { "Latitude": "37.4355672", "Longitude": "126.9388092", "Region": "서울", "Name": "서울본부", "Note": "" }
+      "properties": { "Latitude": "37.4355672", "Longitude": "126.9388092", "name": "Seoul HQ", "category": "office" }
     }
   ]
 }
