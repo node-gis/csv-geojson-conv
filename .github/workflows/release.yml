@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write # required for npm publish --provenance
 
 jobs:
   publish:
@@ -58,6 +59,6 @@ jobs:
             DIST_TAG=latest
           fi
           echo "Publishing with dist-tag: $DIST_TAG"
-          npm publish --access public --tag "$DIST_TAG"
+          npm publish --provenance --access public --tag "$DIST_TAG"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

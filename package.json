@@ -1,7 +1,7 @@
 {
   "name": "@node-gis/csv-geojson-conv",
-  "version": "1.0.0-beta.5",
-  "description": "ESM/CJS module to convert CSV string to GeoJSON in node.js or browser",
+  "version": "1.0.0-beta.6",
+  "description": "Convert CSV to GeoJSON in Node.js or the browser — ESM/CJS library plus a zero-install CLI (npx/bunx)",
   "packageManager": "bun@1.3.9",
   "author": {
     "name": "Jeongyong Park",
@@ -19,29 +19,58 @@
   "keywords": [
     "csv",
     "geojson",
-    "convert"
+    "convert",
+    "converter",
+    "cli",
+    "gis",
+    "mapping",
+    "coordinates",
+    "wgs84",
+    "point",
+    "featurecollection"
   ],
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/esm/index.d.ts",
+        "default": "./lib/esm/index.js"
+      },
+      "require": {
+        "types": "./lib/cjs/index.d.ts",
+        "default": "./lib/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "csv-geojson-conv": "./lib/cjs/cli.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "sideEffects": false,
   "files": [
-    "lib/"
+    "lib/",
+    "src/"
   ],
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && node scripts/postbuild.mjs",
+    "prepublishOnly": "bun run build",
     "check": "bun run build && bun test",
     "test": "bun test",
-    "tsc": "bun run build"
+    "tsc": "bun run build",
+    "lint": "biome check",
+    "format": "biome format --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.0",
     "@types/bun": "^1.3.14",
     "@types/node": "^25.9.3",
     "typescript": "^6.0.3"

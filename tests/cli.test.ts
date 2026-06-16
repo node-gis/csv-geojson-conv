@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 // Exercises the built CLI binary. Requires `bun run build` first
 // (CI runs the build step before tests).
@@ -49,5 +49,38 @@ describe("cli", () => {
         const { stderr, exitCode } = await runCli([], "Latitude,Longitude\n99,127.2");
         expect(exitCode).toBe(1);
         expect(stderr).toContain("Out-of-range latitude");
+    });
+
+    test("rejects an option with a missing value", async () => {
+        const { stderr, exitCode } = await runCli(["--latitude"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(2);
+        expect(stderr).toContain("Missing value for --latitude");
+    });
+
+    test("rejects -o immediately followed by another flag", async () => {
+        const { stderr, exitCode } = await runCli(["-o", "--pretty"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(2);
+        expect(stderr).toContain("Missing value for -o");
+    });
+
+    test("supports --flag=value syntax", async () => {
+        const { stdout, exitCode } = await runCli(
+            ["--latitude=lat", "--longitude=lon"],
+            "lat,lon\n37.1,127.2",
+        );
+        expect(exitCode).toBe(0);
+        expect(JSON.parse(stdout).features[0].geometry.coordinates).toEqual([127.2, 37.1]);
+    });
+
+    test("rejects --flag= with an empty inline value", async () => {
+        const { stderr, exitCode } = await runCli(["--latitude="], "lat,lon\n37.1,127.2");
+        expect(exitCode).toBe(2);
+        expect(stderr).toContain("Missing value for --latitude");
+    });
+
+    test("treats a bare - as stdin", async () => {
+        const { stdout, exitCode } = await runCli(["-"], "Latitude,Longitude\n37.1,127.2");
+        expect(exitCode).toBe(0);
+        expect(JSON.parse(stdout).features[0].geometry.coordinates).toEqual([127.2, 37.1]);
     });
 });
