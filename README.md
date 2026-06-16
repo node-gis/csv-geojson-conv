@@ -35,10 +35,12 @@ fetch('data/repeater.csv').then(async res => {
 
 this is sample csv file.
 ```csv
-Latitude,Longitude,name,point,notes
-37.4355672,126.9388092,Seoul-1,99.9,-
-35.0819546,129.0552017,Busan-2,88.8,
+Latitude,Longitude,Region,Name,Note
+37.4355672,126.9388092,서울,서울본부,
+35.0819546,129.0552017,부산,KBS중계소,
 ```
+
+`Latitude` and `Longitude` columns become the GeoJSON `Point` coordinates; every other column is copied into the feature's `properties`. Coordinates must be valid WGS84 (latitude -90..90, longitude -180..180) or conversion throws.
 
 ### if column names are different like that in your CSV.
 
@@ -50,6 +52,6 @@ const geojson = csvToGeojson(csvdata, { latitudeColumnName: 'lat', longitudeColu
 
 ## LICENSE
 
-Licensed [MIT](https://github.com/Jeongyong-park/csv-geojson-convmocha/blob/master/LICENSE)
+Licensed [MIT](https://github.com/Jeongyong-park/csv-geojson-conv/blob/main/LICENSE)
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FJeongyong-park%2Fcsv-geojson-conv.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FJeongyong-park%2Fcsv-geojson-conv?ref=badge_large)

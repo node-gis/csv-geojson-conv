@@ -38,4 +38,16 @@ describe("csvToGeojson", () => {
             'Invalid coordinate value "not-a-number" in column "Latitude" at CSV row 2',
         );
     });
+
+    test("throws when latitude is out of range", () => {
+        expect(() => csvToGeojson("Latitude,Longitude\n99,127.2")).toThrow(
+            'Out-of-range latitude "99" in column "Latitude" at CSV row 2 (expected -90..90)',
+        );
+    });
+
+    test("throws when longitude is out of range", () => {
+        expect(() => csvToGeojson("Latitude,Longitude\n37.1,-200")).toThrow(
+            'Out-of-range longitude "-200" in column "Longitude" at CSV row 2 (expected -180..180)',
+        );
+    });
 });
