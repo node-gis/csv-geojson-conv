@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "node:fs";
 
 import CSVtoGeoJSON from "./index";
 
@@ -7,6 +7,7 @@ const pkg = require("../../package.json") as { name: string; version: string };
 
 interface CliArgs {
     file?: string;
+    stdin: boolean;
     latitude?: string;
     longitude?: string;
     output?: string;
@@ -31,48 +32,75 @@ Options:
   -h, --help           show this help
   -v, --version        show version
 
+Options accept both "--flag value" and "--flag=value" forms. A bare "-" reads
+from stdin.
+
 Examples:
   csv-geojson-conv points.csv
   csv-geojson-conv points.csv --pretty -o points.geojson
-  cat points.csv | csv-geojson-conv --latitude lat --longitude lon
+  cat points.csv | csv-geojson-conv --latitude=lat --longitude=lon
 `;
 
 function parseArgs(argv: string[]): CliArgs {
-    const args: CliArgs = { pretty: false, help: false, version: false };
-
-    // Consume the value that follows an option, rejecting a missing value or
-    // another flag (e.g. `--latitude --longitude` or a trailing `-o`).
-    const takeValue = (i: number, flag: string): string => {
-        const value = argv[i + 1];
-        if (value === undefined || value.startsWith("-")) {
-            throw new Error(`Missing value for ${flag}`);
-        }
-        return value;
-    };
+    const args: CliArgs = { stdin: false, pretty: false, help: false, version: false };
 
     for (let i = 0; i < argv.length; i++) {
-        const arg = argv[i];
+        // Support GNU `--flag=value` syntax by splitting the inline value off.
+        let arg = argv[i];
+        let inline: string | undefined;
+        if (arg.startsWith("--") && arg.includes("=")) {
+            const eq = arg.indexOf("=");
+            inline = arg.slice(eq + 1);
+            arg = arg.slice(0, eq);
+        }
+
+        // Resolve a value for an option from either `--flag=value` or `--flag value`,
+        // rejecting a missing value or one that looks like another flag.
+        const valueFor = (flag: string): string => {
+            if (inline !== undefined) {
+                if (inline === "") throw new Error(`Missing value for ${flag}`);
+                return inline;
+            }
+            const value = argv[i + 1];
+            if (value === undefined || value.startsWith("-")) {
+                throw new Error(`Missing value for ${flag}`);
+            }
+            i++;
+            return value;
+        };
+
+        const noInline = (flag: string): void => {
+            if (inline !== undefined) throw new Error(`Option ${flag} does not take a value`);
+        };
+
         switch (arg) {
             case "-h":
             case "--help":
+                noInline(arg);
                 args.help = true;
                 break;
             case "-v":
             case "--version":
+                noInline(arg);
                 args.version = true;
                 break;
             case "--pretty":
+                noInline(arg);
                 args.pretty = true;
                 break;
             case "--latitude":
-                args.latitude = takeValue(i++, arg);
+                args.latitude = valueFor(arg);
                 break;
             case "--longitude":
-                args.longitude = takeValue(i++, arg);
+                args.longitude = valueFor(arg);
                 break;
             case "-o":
             case "--output":
-                args.output = takeValue(i++, arg);
+                args.output = valueFor(arg);
+                break;
+            case "-":
+                // A bare "-" is the conventional name for stdin.
+                args.stdin = true;
                 break;
             default:
                 if (arg.startsWith("-")) {
@@ -106,9 +134,10 @@ function main(): void {
         return;
     }
 
-    // No file argument means read CSV from stdin (file descriptor 0).
-    // Guard against an interactive terminal, where reading stdin would hang.
-    if (args.file === undefined && process.stdin.isTTY) {
+    // No file argument means read CSV from stdin (file descriptor 0). Guard
+    // against an interactive terminal — unless the user explicitly asked for
+    // stdin with "-" — where reading stdin would hang.
+    if (args.file === undefined && !args.stdin && process.stdin.isTTY) {
         process.stderr.write(`No input. Provide a CSV file or pipe CSV via stdin.\n\n${HELP}`);
         process.exit(2);
     }
@@ -122,9 +151,9 @@ function main(): void {
     const json = JSON.stringify(geojson, null, args.pretty ? 2 : undefined);
 
     if (args.output) {
-        writeFileSync(args.output, json + "\n");
+        writeFileSync(args.output, `${json}\n`);
     } else {
-        process.stdout.write(json + "\n");
+        process.stdout.write(`${json}\n`);
     }
 }
 

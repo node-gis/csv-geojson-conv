@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import { readFileSync } from "fs";
-import { resolve } from "path";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 import csvToGeojson, { csvToGeoJSON } from "../src";
 
@@ -58,6 +58,27 @@ describe("csvToGeojson", () => {
         expect(() => csvToGeojson("Latitude,Longitude\n  ,127.2")).toThrow(
             'Empty coordinate value in column "Latitude" at CSV row 2',
         );
+    });
+
+    test("handles CRLF line endings", () => {
+        const geojson = csvToGeojson("Latitude,Longitude,name\r\n37.1,127.2,a\r\n35.0,129.0,b");
+        expect(geojson.features.length).toBe(2);
+        expect(geojson.features[1].properties.name).toBe("b");
+    });
+
+    test("handles quoted fields containing commas", () => {
+        const geojson = csvToGeojson('Latitude,Longitude,address\n37.1,127.2,"Seoul, Korea"');
+        expect(geojson.features[0].properties.address).toBe("Seoul, Korea");
+    });
+
+    test("returns an empty FeatureCollection for a header-only CSV", () => {
+        const geojson = csvToGeojson("Latitude,Longitude,name");
+        expect(geojson.type).toBe("FeatureCollection");
+        expect(geojson.features).toEqual([]);
+    });
+
+    test("throws on a ragged row with the wrong column count", () => {
+        expect(() => csvToGeojson("Latitude,Longitude,name\n37.1,127.2")).toThrow();
     });
 
     test("strips a UTF-8 BOM from the header (Excel/Windows CSVs)", () => {

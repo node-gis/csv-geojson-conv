@@ -62,14 +62,16 @@ Options:
   -v, --version        show version
 ```
 
+Options accept both `--flag value` and `--flag=value` forms. A bare `-` reads from stdin.
+
 Examples:
 
 ```sh
 # Convert a file and pretty-print to a new file
 npx @node-gis/csv-geojson-conv points.csv --pretty -o points.geojson
 
-# Pipe CSV in via stdin, with custom column names
-cat points.csv | npx @node-gis/csv-geojson-conv --latitude lat --longitude lon
+# Pipe CSV in via stdin, with custom column names (--flag=value form)
+cat points.csv | npx @node-gis/csv-geojson-conv --latitude=lat --longitude=lon
 ```
 
 ## Library usage

@@ -16,11 +16,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `engines` field (`node >= 18`).
 - `.gitattributes` to normalize line endings to LF.
 - Source files shipped in the published package so source maps resolve.
+- CLI: `--flag=value` syntax and a bare `-` to read from stdin.
+- Biome lint/format with `lint`/`format` scripts and a CI lint job.
+- CI test matrix on Node 18/20/22 plus a consumer smoke test that
+  exercises the built package as CJS, ESM, and CLI.
+- npm publish provenance on release.
+- Expanded npm keywords and a clearer package description.
 
 ### Changed
 
 - Coordinate validation now throws on empty/whitespace values instead of
   silently emitting `[0, 0]` (Null Island).
+- CSV parsing strips a UTF-8 BOM so Excel/Windows exports work.
+
+### Fixed
+
+- CLI now rejects options with a missing value, guards against hanging on
+  an interactive TTY, and no longer writes a file named after a flag.
 
 ## [1.0.0-beta.5]
 

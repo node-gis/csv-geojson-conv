@@ -1,4 +1,4 @@
-import type { FeatureCollection, Point } from 'geojson';
+import type { FeatureCollection, Point } from "geojson";
 export interface CSVtoGeoJSONOptions {
     latitudeColumnName?: string;
     longitudeColumnName?: string;
