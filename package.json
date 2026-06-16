@@ -8,7 +8,14 @@
     "email": "kladess@gmail.com",
     "url": "https://github.com/Jeongyong-park"
   },
-  "homepage": "https://github.com/Jeongyong-park/csv-geojson-conv",
+  "homepage": "https://github.com/node-gis/csv-geojson-conv#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/node-gis/csv-geojson-conv.git"
+  },
+  "bugs": {
+    "url": "https://github.com/node-gis/csv-geojson-conv/issues"
+  },
   "keywords": [
     "csv",
     "geojson",
