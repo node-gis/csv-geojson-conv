@@ -17,6 +17,10 @@ function readCoordinate(row: CSVRecord, columnName: string, rowIndex: number, ax
         throw new Error(`Missing coordinate column "${columnName}" at CSV row ${rowIndex + 2}`);
     }
 
+    if (rawValue.trim() === "") {
+        throw new Error(`Empty coordinate value in column "${columnName}" at CSV row ${rowIndex + 2}`);
+    }
+
     const value = Number(rawValue);
     if (!Number.isFinite(value)) {
         throw new Error(`Invalid coordinate value "${rawValue}" in column "${columnName}" at CSV row ${rowIndex + 2}`);
@@ -51,3 +55,6 @@ function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCol
 }
 
 export default CSVtoGeoJSON;
+// Named export so CommonJS consumers can write
+// `const { csvToGeoJSON } = require('@node-gis/csv-geojson-conv')`.
+export { CSVtoGeoJSON as csvToGeoJSON };

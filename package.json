@@ -24,19 +24,36 @@
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "types": "./lib/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/esm/index.d.ts",
+        "default": "./lib/esm/index.js"
+      },
+      "require": {
+        "types": "./lib/cjs/index.d.ts",
+        "default": "./lib/cjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "csv-geojson-conv": "./lib/cjs/cli.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "sideEffects": false,
   "files": [
-    "lib/"
+    "lib/",
+    "src/"
   ],
   "license": "MIT",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && node scripts/postbuild.mjs",
     "check": "bun run build && bun test",
     "test": "bun test",
     "tsc": "bun run build"

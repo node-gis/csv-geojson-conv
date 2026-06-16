@@ -6,4 +6,5 @@ export interface CSVtoGeoJSONOptions {
 type CSVRecord = Record<string, string>;
 declare function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCollection<Point, CSVRecord>;
 export default CSVtoGeoJSON;
+export { CSVtoGeoJSON as csvToGeoJSON };
 //# sourceMappingURL=index.d.ts.map

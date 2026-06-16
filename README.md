@@ -75,10 +75,12 @@ cat points.csv | npx @node-gis/csv-geojson-conv --latitude lat --longitude lon
 ## Library usage
 
 ```js
-// ESM
+// ESM (default or named import)
 import csvToGeojson from '@node-gis/csv-geojson-conv';
-// CommonJS
-const csvToGeojson = require('@node-gis/csv-geojson-conv');
+// import { csvToGeoJSON } from '@node-gis/csv-geojson-conv';
+
+// CommonJS (use the named export)
+const { csvToGeoJSON: csvToGeojson } = require('@node-gis/csv-geojson-conv');
 
 const csv = `Latitude,Longitude,name,category
 37.4355672,126.9388092,Seoul HQ,office
