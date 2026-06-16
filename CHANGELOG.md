@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-beta.7]
+
 ### Added
 
 - TopoJSON output: new named export `csvToTopoJSON(csv, options)` (with an
@@ -55,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README rewritten in English, leading with the CSV → GeoJSON value
   proposition and a no-install quick start.
 
-[Unreleased]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.6...HEAD
+[Unreleased]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.7...HEAD
+[1.0.0-beta.7]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.6...v1.0.0-beta.7
 [1.0.0-beta.6]: https://github.com/node-gis/csv-geojson-conv/compare/v1.0.0-beta.5...v1.0.0-beta.6
 [1.0.0-beta.5]: https://github.com/node-gis/csv-geojson-conv/releases/tag/v1.0.0-beta.5

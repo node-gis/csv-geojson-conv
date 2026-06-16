@@ -1,6 +1,6 @@
 {
   "name": "@node-gis/csv-geojson-conv",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "description": "Convert CSV to GeoJSON or TopoJSON in Node.js or the browser — ESM/CJS library plus a zero-install CLI (npx/bunx)",
   "packageManager": "bun@1.3.9",
   "author": {
