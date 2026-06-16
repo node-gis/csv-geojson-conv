@@ -1,27 +1,46 @@
-import * as fs from 'fs'
-import path from 'path';
 import { parse } from 'csv-parse/sync';
 
-import { Feature, FeatureCollection, GeoJsonObject } from 'geojson';
+import type { Feature, FeatureCollection, Point } from 'geojson';
 
-interface CSVtoGeoJSONOptions {
+export interface CSVtoGeoJSONOptions {
     latitudeColumnName?: string;
     longitudeColumnName?: string;
 }
-type RecordType = { [x: string]: number | string; }
+type CSVRecord = Record<string, string>;
 
-function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): GeoJsonObject {
+function readCoordinate(row: CSVRecord, columnName: string, rowIndex: number): number {
+    const rawValue = row[columnName];
+
+    if (rawValue === undefined) {
+        throw new Error(`Missing coordinate column "${columnName}" at CSV row ${rowIndex + 2}`);
+    }
+
+    const value = Number(rawValue);
+    if (!Number.isFinite(value)) {
+        throw new Error(`Invalid coordinate value "${rawValue}" in column "${columnName}" at CSV row ${rowIndex + 2}`);
+    }
+
+    return value;
+}
+
+function CSVtoGeoJSON(strCsv: string, options?: CSVtoGeoJSONOptions): FeatureCollection<Point, CSVRecord> {
     const { latitudeColumnName = "Latitude", longitudeColumnName = "Longitude" } = options || {};
 
-    const records: RecordType[] = parse(strCsv, { columns: true, trim: true });
+    const records = parse(strCsv, { columns: true, trim: true, skip_empty_lines: true }) as CSVRecord[];
 
-    const features: Feature[] = records.map((row: { [x: string]: number | string; }) => {
-        const feature: Feature = { type: "Feature", properties: row, geometry: { type: "Point", coordinates: [row[longitudeColumnName] as number, row[latitudeColumnName] as number] } };
-        return feature;
-    })
+    const features: Feature<Point, CSVRecord>[] = records.map((row, rowIndex) => ({
+        type: "Feature",
+        properties: row,
+        geometry: {
+            type: "Point",
+            coordinates: [
+                readCoordinate(row, longitudeColumnName, rowIndex),
+                readCoordinate(row, latitudeColumnName, rowIndex),
+            ],
+        },
+    }));
 
-    const featureCollection: FeatureCollection = { type: "FeatureCollection", features };
-    return featureCollection as GeoJsonObject;
+    return { type: "FeatureCollection", features };
 }
 
 export default CSVtoGeoJSON;

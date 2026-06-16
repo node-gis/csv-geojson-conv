@@ -1,17 +1,41 @@
-import fs from "fs";
-import path from "path";
-import CsvToGeojson from "../src";
+import { describe, expect, test } from "bun:test";
+import { readFileSync } from "fs";
+import { resolve } from "path";
 
-var assert = require('assert');
+import csvToGeojson from "../src";
 
-describe('Test Suite 1', function () {
-  it('Test 1', function () {
+describe("csvToGeojson", () => {
+    test("converts CSV rows to GeoJSON point features with numeric coordinates", () => {
+        const csvfile = resolve(__dirname, "./data/repeater.csv");
+        const csv = readFileSync(csvfile, "utf8");
+        const geojson = csvToGeojson(csv);
 
-    const csvfile = path.resolve(__dirname, './data/repeater.csv');
-    const csvFs = fs.readFileSync(csvfile, 'utf8');
-    const geojson = CsvToGeojson(csvFs.toString())
+        expect(geojson.type).toBe("FeatureCollection");
+        expect(geojson.features.length).toBeGreaterThan(0);
+        expect(geojson.features[0].geometry.coordinates).toEqual([126.9388092, 37.4355672]);
+        expect(typeof geojson.features[0].geometry.coordinates[0]).toBe("number");
+        expect(geojson.features[0].properties.Region).toBe("서울");
+    });
 
-    fs.writeFileSync(path.resolve(__dirname, './data/repeater-result.geojson'), JSON.stringify(geojson, null, 2));
+    test("supports custom coordinate column names", () => {
+        const geojson = csvToGeojson("lat,lon,name\n37.1,127.2,test", {
+            latitudeColumnName: "lat",
+            longitudeColumnName: "lon",
+        });
 
-  })
-})
+        expect(geojson.features[0].geometry.coordinates).toEqual([127.2, 37.1]);
+        expect(geojson.features[0].properties.name).toBe("test");
+    });
+
+    test("throws when a coordinate column is missing", () => {
+        expect(() => csvToGeojson("Latitude,name\n37.1,test")).toThrow(
+            'Missing coordinate column "Longitude" at CSV row 2',
+        );
+    });
+
+    test("throws when a coordinate value is invalid", () => {
+        expect(() => csvToGeojson("Latitude,Longitude\nnot-a-number,127.2")).toThrow(
+            'Invalid coordinate value "not-a-number" in column "Latitude" at CSV row 2',
+        );
+    });
+});
