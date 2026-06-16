@@ -78,6 +78,14 @@ npx @node-gis/csv-geojson-conv points.csv --format topojson -o points.topojson
 cat points.csv | npx @node-gis/csv-geojson-conv --latitude=lat --longitude=lon
 ```
 
+> **Windows / PowerShell:** prefer `-o <file>` over `>` redirection. PowerShell's
+> `>` re-encodes the tool's UTF-8 output through the console code page, which
+> corrupts non-ASCII text (e.g. Korean). `-o` writes UTF-8 directly:
+>
+> ```powershell
+> npx @node-gis/csv-geojson-conv points.csv -o points.geojson
+> ```
+
 ## Library usage
 
 ```js
