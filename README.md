@@ -1,9 +1,9 @@
-# csv-geojson-conv
+# @node-gis/csv-geojson-conv
 
 [![CI](https://github.com/node-gis/csv-geojson-conv/actions/workflows/ci.yml/badge.svg)](https://github.com/node-gis/csv-geojson-conv/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/csv-geojson-conv.svg)](https://www.npmjs.com/package/csv-geojson-conv)
-[![npm downloads](https://img.shields.io/npm/dm/csv-geojson-conv.svg)](https://www.npmjs.com/package/csv-geojson-conv)
-[![license](https://img.shields.io/npm/l/csv-geojson-conv.svg)](https://github.com/node-gis/csv-geojson-conv/blob/main/LICENSE)
+[![npm version](https://img.shields.io/npm/v/@node-gis/csv-geojson-conv.svg)](https://www.npmjs.com/package/@node-gis/csv-geojson-conv)
+[![npm downloads](https://img.shields.io/npm/dm/@node-gis/csv-geojson-conv.svg)](https://www.npmjs.com/package/@node-gis/csv-geojson-conv)
+[![license](https://img.shields.io/npm/l/@node-gis/csv-geojson-conv.svg)](https://github.com/node-gis/csv-geojson-conv/blob/main/LICENSE)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fnode-gis%2Fcsv-geojson-conv?ref=badge_shield&issueType=security)
 
@@ -12,20 +12,20 @@ A tiny ESM/CJS module that converts a CSV string into a GeoJSON `FeatureCollecti
 ## Install
 
 ```sh
-npm install csv-geojson-conv
+npm install @node-gis/csv-geojson-conv
 # or
-yarn add csv-geojson-conv
+yarn add @node-gis/csv-geojson-conv
 # or
-bun add csv-geojson-conv
+bun add @node-gis/csv-geojson-conv
 ```
 
 ## Usage
 
 ```js
 // ESM
-import csvToGeojson from 'csv-geojson-conv';
+import csvToGeojson from '@node-gis/csv-geojson-conv';
 // CommonJS
-const csvToGeojson = require('csv-geojson-conv');
+const csvToGeojson = require('@node-gis/csv-geojson-conv');
 
 const csv = `Latitude,Longitude,Region,Name,Note
 37.4355672,126.9388092,서울,서울본부,
@@ -52,7 +52,7 @@ Result:
 ### Browser (fetch)
 
 ```js
-import csvToGeojson from 'csv-geojson-conv';
+import csvToGeojson from '@node-gis/csv-geojson-conv';
 
 fetch('data/points.csv')
   .then((res) => res.text())
